@@ -1,4 +1,4 @@
-# 🔍 Multi-Agent AI Research System
+# 🔍 Multi Agent AI Research System
 
 <p align="center">
   <b>An autonomous multi-agent AI pipeline that researches, writes, and refines reports — powered by LangChain & Mistral AI</b>
