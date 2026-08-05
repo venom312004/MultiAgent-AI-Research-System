@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License">
 </p>
 
-🔗 **Live Demo:** [multi-agent-ai-system-pranjal-pandey-2003.streamlit.app](https://multi-agent-ai-system-pranjal-pandey-2003.streamlit.app/)
+🔗 **Live Demo:** [multiagent-ai-research-system-pranjal-pandey-2003.streamlit.app](https://multiagent-ai-research-system-pranjal-pandey-2003.streamlit.app/)
 
 ---
 
