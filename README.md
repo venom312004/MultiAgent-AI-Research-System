@@ -1,4 +1,4 @@
-# 🔍 Multi-Agent AI Research System
+# 🔍 Multi Agent AI Research System
 
 <p align="center">
   <b>An autonomous multi-agent AI pipeline that researches, writes, and refines reports — powered by LangChain & Mistral AI</b>
@@ -11,6 +11,8 @@
   <img src="https://img.shields.io/badge/Streamlit-UI-red?logo=streamlit" alt="Streamlit">
   <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License">
 </p>
+
+🔗 **Live Demo:** [multiagent-ai-research-system-pranjal-pandey-2003.streamlit.app](https://multiagent-ai-research-system-pranjal-pandey-2003.streamlit.app/)
 
 ---
 
