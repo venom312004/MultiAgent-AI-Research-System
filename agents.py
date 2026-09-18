@@ -15,7 +15,7 @@ for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
     if key not in os.environ and key in st.secrets:
         os.environ[key] = st.secrets[key]
 
-llm=ChatMistralAI(model="mistral-small-2506",temperature=0)
+llm=ChatMistralAI(model="mistral-small-2506",temperature=0,max_retries=5,timeout=60,)
 # first agent
 def build_serach_agent():
     return create_agent(

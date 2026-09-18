@@ -1,6 +1,8 @@
 import streamlit as st
 import time
+import httpx
 from pipeline import run_research_pipeline
+
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -384,13 +386,20 @@ if st.session_state.running and not st.session_state.done:
     topic_val = st.session_state.topic_input
 
     with st.spinner("🔍 📄 ✍️ 🧐  Running the full research pipeline…"):
-        state = run_research_pipeline(topic_val)
+        try:
+            state = run_research_pipeline(topic_val)
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 429:
+                st.warning("Hit Mistral's rate limit — please wait a moment and try again.")
+            else:
+                st.error(f"API error {e.response.status_code}: {e.response.text[:300]}")
+            st.session_state.running = False
+            st.stop()
 
     st.session_state.results = state
     st.session_state.running = False
     st.session_state.done = True
     st.rerun()
-
 
 # ── Results display ───────────────────────────────────────────────────────────
 r = st.session_state.results
