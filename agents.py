@@ -7,9 +7,15 @@ import os
 from rich import print
 from dotenv import load_dotenv
 load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
+import streamlit as st
 
-llm=ChatMistralAI(model="mistral-small-2506",temperature=0)   #temp=0 for same response not much creative
+for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
+    if key not in os.environ and key in st.secrets:
+        os.environ[key] = st.secrets[key]
 
+llm=ChatMistralAI(model="mistral-small-2506",temperature=0)
 # first agent
 def build_serach_agent():
     return create_agent(
