@@ -13,7 +13,7 @@ for key in ("GROQ_API_KEY", "TAVILY_API_KEY"):
     if key not in os.environ and key in st.secrets:
         os.environ[key] = st.secrets[key]
 
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0, max_retries=5, timeout=60)
+llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0, max_retries=5, timeout=60)
 
 # first agent
 def build_serach_agent():
