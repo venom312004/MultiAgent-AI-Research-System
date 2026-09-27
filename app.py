@@ -390,7 +390,7 @@ if st.session_state.running and not st.session_state.done:
             state = run_research_pipeline(topic_val)
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 429:
-                st.warning("Hit Mistral's rate limit — please wait a moment and try again.")
+                st.warning("Hit Groq's rate limit — please wait a moment and try again.")
             else:
                 st.error(f"API error {e.response.status_code}: {e.response.text[:300]}")
             st.session_state.running = False

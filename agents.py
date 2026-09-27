@@ -1,36 +1,35 @@
 from langchain.agents import create_agent
-from langchain_mistralai import ChatMistralAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from  tools import web_search,scrape_url
+from tools import web_search, scrape_url
 import os
 from rich import print
 from dotenv import load_dotenv
 load_dotenv()
-from dotenv import load_dotenv
-load_dotenv()
 import streamlit as st
 
-for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
+for key in ("GROQ_API_KEY", "TAVILY_API_KEY"):
     if key not in os.environ and key in st.secrets:
         os.environ[key] = st.secrets[key]
 
-llm=ChatMistralAI(model="mistral-small-2506",temperature=0,max_retries=5,timeout=60,)
+llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0, max_retries=5, timeout=60)
+
 # first agent
 def build_serach_agent():
     return create_agent(
-        model=llm,tools=[web_search]
+        model=llm, tools=[web_search]
     )
-    
+
 # second agent
 def build_search_reader_agent():
     return create_agent(
-        model=llm,tools=[scrape_url]
+        model=llm, tools=[scrape_url]
     )
-    
+
 # writer chain
-writer_prompt=ChatPromptTemplate.from_messages([
-        ("system", "You are an expert research writer. Write clear, structured and insightful reports."),
+writer_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are an expert research writer. Write clear, structured and insightful reports."),
     ("human", """Write a detailed research report on the topic below.
 
 Topic: {topic}
@@ -45,18 +44,15 @@ Structure the report as:
 - Sources (list all URLs found in the research)
 
 Be detailed, factual and professional.""")
-    
 ])
 
-parser=StrOutputParser()
+parser = StrOutputParser()
 
 writer_chain = writer_prompt | llm | parser
 
 
-
-#critic chain (Feedback)
-
-critic_prompt=ChatPromptTemplate.from_messages([
+# critic chain (Feedback)
+critic_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a sharp and constructive research critic. Be honest and specific."),
     ("human", """Review the research report below and evaluate it strictly.
 
@@ -79,5 +75,4 @@ One line verdict:
 ..."""),
 ])
 
-critic_chain= critic_prompt | llm | parser
-
+critic_chain = critic_prompt | llm | parser

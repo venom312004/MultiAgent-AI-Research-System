@@ -1,13 +1,13 @@
 # 🔍 Multi Agent AI Research System
 
 <p align="center">
-  <b>An autonomous multi-agent AI pipeline that researches, writes, and refines reports — powered by LangChain & Mistral AI</b>
+  <b>An autonomous multi-agent AI pipeline that researches, writes, and refines reports — powered by LangChain & Groq</b>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.11-blue?logo=python" alt="Python">
   <img src="https://img.shields.io/badge/LangChain-Framework-green" alt="LangChain">
-  <img src="https://img.shields.io/badge/Mistral%20AI-LLM-orange" alt="Mistral AI">
+  <img src="https://img.shields.io/badge/Groq-LLM-orange" alt="Groq">
   <img src="https://img.shields.io/badge/Streamlit-UI-red?logo=streamlit" alt="Streamlit">
   <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License">
 </p>
@@ -20,7 +20,7 @@
 
 **Multi-Agent AI Research System** is an autonomous research assistant that mimics how a human research team works. Instead of relying on a single LLM call, it breaks the research process into **four specialized agents**, each handling a distinct part of the workflow — from finding sources to producing a polished, fact-checked report.
 
-Built with **LangChain** for orchestration and **Mistral AI** as the underlying LLM, the system is exposed through a clean, dark-orange themed **Streamlit** interface.
+Built with **LangChain** for orchestration and **Groq** as the underlying LLM provider, the system is exposed through a clean, dark-orange themed **Streamlit** interface.
 
 ---
 
@@ -31,7 +31,7 @@ Built with **LangChain** for orchestration and **Mistral AI** as the underlying 
 - ✍️ **AI Report Writing** — Synthesizes gathered data into a structured, coherent report
 - 🧐 **Self-Critique Loop** — A dedicated critic agent reviews and refines the output for accuracy and quality
 - 🎨 **Interactive UI** — Simple Streamlit interface with a custom dark-orange theme
-- ⚡ **Fast LLM Backend** — Powered by Mistral AI's `mistral-small-2506` model
+- ⚡ **Fast LLM Backend** — Powered by Groq's `llama-3.3-70b-versatile` model
 
 ---
 
@@ -61,7 +61,7 @@ Final Report Output
 |----------|-----------|
 | Language | Python 3.11 |
 | Orchestration | LangChain |
-| LLM | Mistral AI (`mistral-small-2506`) |
+| LLM | Groq (`llama-3.3-70b-versatile`) |
 | UI | Streamlit (custom dark-orange theme) |
 | Environment Manager | `uv` |
 
@@ -82,7 +82,7 @@ Multi-Agent-AI-System/
 ### Prerequisites
 - Python 3.11+
 - [`uv`](https://github.com/astral-sh/uv) package manager
-- A Mistral AI API key
+- A Groq API key ([console.groq.com](https://console.groq.com))
 
 ### Installation
 
@@ -107,7 +107,8 @@ uv pip install -r requirements.txt
 Create a `.env` file in the root directory:
 
 ```env
-MISTRAL_API_KEY=your_mistral_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
 ```
 
 ### Run the App
@@ -159,4 +160,4 @@ GitHub: [@venom312004](https://github.com/venom312004)
 
 ---
 
-<p align="center">Made with ❤️ using LangChain & Mistral AI</p>
+<p align="center">Made with ❤️ using LangChain & Groq</p>
