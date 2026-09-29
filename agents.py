@@ -1,3 +1,4 @@
+from datetime import date  # ADDED (ab use nahi, pipeline se aata hai; chaho to hata do)
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
@@ -13,7 +14,7 @@ for key in ("GROQ_API_KEY", "TAVILY_API_KEY"):
     if key not in os.environ and key in st.secrets:
         os.environ[key] = st.secrets[key]
 
-# CHANGE 1: bada model sirf writer/critic ke liye, max_tokens se output limit
+# bada model: sirf writer/critic ke liye
 llm = ChatGroq(
     model="openai/gpt-oss-120b",
     temperature=0,
@@ -22,7 +23,7 @@ llm = ChatGroq(
     max_tokens=2000,
 )
 
-# CHANGE 2: chhota model search + reader agents ke liye (alag rate-limit bucket)
+# chhota model: search + reader agents ke liye
 small_llm = ChatGroq(
     model="openai/gpt-oss-20b",
     temperature=0,
@@ -32,26 +33,22 @@ small_llm = ChatGroq(
     reasoning_effort="low",
 )
 
-# first agent
-# CHANGE 3: spelling fix + small_llm
+
 def build_search_agent():
-    return create_agent(
-        model=small_llm, tools=[web_search]
-    )
+    return create_agent(model=small_llm, tools=[web_search])
 
-# purana naam bhi chalta rahe, taaki pipeline.py na toote
-build_serach_agent = build_search_agent
 
-# second agent
-# CHANGE 4: small_llm
 def build_search_reader_agent():
-    return create_agent(
-        model=small_llm, tools=[scrape_url]
-    )
+    return create_agent(model=small_llm, tools=[scrape_url])
 
-# writer chain (same as before)
+
+# writer chain
+# CHANGED: {today} add kiya, aur "sirf research se facts lo" instruction
 writer_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are an expert research writer. Write clear, structured and insightful reports."),
+    ("system",
+     "You are an expert research writer. Today's date is {today}. "
+     "Write clear, structured and insightful reports. "
+     "Use only facts present in the research provided; do not invent facts or dates."),
     ("human", """Write a detailed research report on the topic below.
 
 Topic: {topic}
@@ -73,7 +70,7 @@ parser = StrOutputParser()
 writer_chain = writer_prompt | llm | parser
 
 
-# critic chain (Feedback) (same as before)
+# critic chain
 critic_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a sharp and constructive research critic. Be honest and specific."),
     ("human", """Review the research report below and evaluate it strictly.

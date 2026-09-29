@@ -1,4 +1,5 @@
 import time
+from datetime import date
 from langgraph.errors import GraphRecursionError
 from agents import build_search_agent, build_search_reader_agent, writer_chain, critic_chain
 
@@ -13,19 +14,26 @@ def run_research_pipeline(topic: str) -> dict:
 
     search_agent = build_search_agent()
     search_result = search_agent.invoke(
-        {"messages": [("user", f"Find recent, reliable and detailed information about: {topic}")]},
+        {"messages": [("user",
+            f"Today's date is {date.today()}. "  # ADDED
+            f"Use the web_search tool to find recent information about: {topic}. "
+            "Do NOT answer from memory. Return a plain list of the results with "
+            "Title, full URL, and a one-line summary for each. Include every URL."
+        )]},
         config={"recursion_limit": 15},
     )
     state["search_results"] = search_result["messages"][-1].content
 
     print("\n search result", state["search_results"])
 
-    time.sleep(10)  # TPM budget refill
+    time.sleep(10)
 
     # step 2 - reader agent
     print("\n" + "=" * 50)
     print("step 2 - reader agent is scraping top resources...")
     print("=" * 50)
+
+    fallback = "No additional scraped content available; rely on search results."
 
     reader_agent = build_search_reader_agent()
     try:
@@ -38,9 +46,15 @@ def run_research_pipeline(topic: str) -> dict:
             )]},
             config={"recursion_limit": 15},
         )
-        state["scrap_result"] = reader_result["messages"][-1].content
+        scrap = reader_result["messages"][-1].content
+
+        # ADDED: apology / failure text report me na jaye
+        head = scrap[:200].lower()
+        if "couldn't" in head or "could not" in head or "sorry" in head:
+            scrap = fallback
+        state["scrap_result"] = scrap
     except GraphRecursionError:
-        state["scrap_result"] = "Reader agent could not finish scraping; using search results only."
+        state["scrap_result"] = fallback
 
     print("\n scraped content", state["scrap_result"])
 
@@ -59,11 +73,12 @@ def run_research_pipeline(topic: str) -> dict:
     state["report"] = writer_chain.invoke({
         "topic": topic,
         "research": research_combine,
+        "today": str(date.today()),  # ADDED
     })
 
     print("\n Report\n", state["report"])
 
-    time.sleep(30)  # writer ke baad budget refill, critic se pehle
+    time.sleep(30)
 
     # step 4 - critic
     print("\n" + "=" * 50)
