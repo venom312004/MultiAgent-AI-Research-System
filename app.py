@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-import httpx
+import groq  # CHANGED: httpx ki jagah groq
 from pipeline import run_research_pipeline
 
 
@@ -385,14 +385,23 @@ if run_btn:
 if st.session_state.running and not st.session_state.done:
     topic_val = st.session_state.topic_input
 
+    # CHANGED: groq ke exceptions catch ho rahe hain
     with st.spinner("🔍 📄 ✍️ 🧐  Running the full research pipeline…"):
         try:
             state = run_research_pipeline(topic_val)
-        except httpx.HTTPStatusError as e:
-            if e.response.status_code == 429:
-                st.warning("Hit Groq's rate limit — please wait a moment and try again.")
+        except groq.RateLimitError:
+            st.warning("Groq ka rate limit hit ho gaya. 1 minute ruk ke dobara try karo.")
+            st.session_state.running = False
+            st.stop()
+        except groq.APIStatusError as e:
+            if e.status_code == 413:
+                st.error("Request Groq ke token limit se badi hai. Thodi der baad try karo ya chhota topic do.")
             else:
-                st.error(f"API error {e.response.status_code}: {e.response.text[:300]}")
+                st.error(f"Groq error {e.status_code}: {e.response.text[:300]}")
+            st.session_state.running = False
+            st.stop()
+        except Exception as e:
+            st.error(f"Unexpected error: {e}")
             st.session_state.running = False
             st.stop()
 
