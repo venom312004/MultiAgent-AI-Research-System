@@ -1,5 +1,6 @@
-import time  # ADDED
-from agents import build_search_agent, build_search_reader_agent, writer_chain, critic_chain  # CHANGED: spelling fix
+import time
+from langgraph.errors import GraphRecursionError
+from agents import build_search_agent, build_search_reader_agent, writer_chain, critic_chain
 
 
 def run_research_pipeline(topic: str) -> dict:
@@ -10,16 +11,16 @@ def run_research_pipeline(topic: str) -> dict:
     print("Step 1 - search agent is working ...")
     print("=" * 50)
 
-    search_agent = build_search_agent()  # CHANGED
+    search_agent = build_search_agent()
     search_result = search_agent.invoke(
         {"messages": [("user", f"Find recent, reliable and detailed information about: {topic}")]},
-        config={"recursion_limit": 6},  # ADDED: agent loop cap
+        config={"recursion_limit": 15},
     )
     state["search_results"] = search_result["messages"][-1].content
 
     print("\n search result", state["search_results"])
 
-    time.sleep(10)  # ADDED: TPM budget refill
+    time.sleep(10)  # TPM budget refill
 
     # step 2 - reader agent
     print("\n" + "=" * 50)
@@ -27,20 +28,23 @@ def run_research_pipeline(topic: str) -> dict:
     print("=" * 50)
 
     reader_agent = build_search_reader_agent()
-    reader_result = reader_agent.invoke(
-        {"messages": [("user",
-            f"Topic: '{topic}'\n\n"
-            f"Search results:\n{state['search_results'][:2500]}\n\n"  # CHANGED: 800 -> 2500 (URLs cut na hon)
-            "Pick the SINGLE most relevant URL and call scrape_url exactly ONCE. "  # CHANGED
-            "Then summarize the content in under 200 words."
-        )]},
-        config={"recursion_limit": 6},  # ADDED
-    )
+    try:
+        reader_result = reader_agent.invoke(
+            {"messages": [("user",
+                f"Topic: '{topic}'\n\n"
+                f"Search results:\n{state['search_results'][:2500]}\n\n"
+                "Pick the SINGLE most relevant URL and call scrape_url exactly ONCE. "
+                "Then summarize the content in under 200 words."
+            )]},
+            config={"recursion_limit": 15},
+        )
+        state["scrap_result"] = reader_result["messages"][-1].content
+    except GraphRecursionError:
+        state["scrap_result"] = "Reader agent could not finish scraping; using search results only."
 
-    state["scrap_result"] = reader_result["messages"][-1].content
     print("\n scraped content", state["scrap_result"])
 
-    time.sleep(10)  # ADDED
+    time.sleep(10)
 
     # step 3 - writer chain
     print("\n" + "=" * 50)
@@ -48,8 +52,8 @@ def run_research_pipeline(topic: str) -> dict:
     print("=" * 50)
 
     research_combine = (
-        f"Search results : \n {state['search_results'][:2500]}\n\n"  # CHANGED: cap
-        f"Detailed scraped content : \n {state['scrap_result'][:2500]}"  # CHANGED: cap
+        f"Search results : \n {state['search_results'][:2500]}\n\n"
+        f"Detailed scraped content : \n {state['scrap_result'][:2500]}"
     )
 
     state["report"] = writer_chain.invoke({
@@ -59,7 +63,7 @@ def run_research_pipeline(topic: str) -> dict:
 
     print("\n Report\n", state["report"])
 
-    time.sleep(30)  # ADDED: writer ne 120b ka budget kharch kiya, critic se pehle refill
+    time.sleep(30)  # writer ke baad budget refill, critic se pehle
 
     # step 4 - critic
     print("\n" + "=" * 50)
