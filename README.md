@@ -31,7 +31,7 @@ Built with **LangChain** for orchestration and **Groq** as the underlying LLM pr
 - ✍️ **AI Report Writing** — Synthesizes gathered data into a structured, coherent report
 - 🧐 **Self-Critique Loop** — A dedicated critic agent reviews and refines the output for accuracy and quality
 - 🎨 **Interactive UI** — Simple Streamlit interface with a custom dark-orange theme
-- ⚡ **Fast LLM Backend** — Powered by Groq's `llama-3.3-70b-versatile` model
+- ⚡ **Fast LLM Backend** — Powered by Groq's `openai/gpt-oss-120b` model
 
 ---
 
@@ -61,7 +61,7 @@ Final Report Output
 |----------|-----------|
 | Language | Python 3.11 |
 | Orchestration | LangChain |
-| LLM | Groq (`llama-3.3-70b-versatile`) |
+| LLM | Groq (`openai/gpt-oss-120b`) |
 | UI | Streamlit (custom dark-orange theme) |
 | Environment Manager | `uv` |
 
